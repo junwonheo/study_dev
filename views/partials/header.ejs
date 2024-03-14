@@ -1,5 +1,12 @@
 <div>
 <h2>
-    <% if (typeof name == 'undefined') { name = 'guest'; } %>
-    <%= name %>님 어서오세요</h2><a href="/login">로그인</a> / <a href="/signup">회원가입</a>
+    <% if (typeof name === 'undefined') { %>
+    <a href="/login">로그인</a> / <a href="/signup">회원가입</a>
+    <% } else { %>
+    <%= name %>님 어서오세요 <a href="/logout">로그아웃</a>
+    <% if (name === 'admin') { %>
+    <a href="/admin">admin Page</a>
+    <% } %>
+    <% } %>
+</h2>
 </div>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div action="/admin" method="post">
+    <form>
+        <table>
+            <tr><td>상품명</td><td><input type="text" name="name"></td></tr>
+            <tr><td>카테고리</td><td><select name="category">
+                <option value="food">음식</option>
+                <option value="garment">의류</option>
+                <option value="tool">도구</option>
+            </select></td></tr>
+            <tr><td>이미지</td><td><input type="file" name="imgPath"></td></tr>
+        </table>
+    </form>
+</div>
+</body>
+</html>

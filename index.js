@@ -10,6 +10,7 @@ const config = require('./config/config.json')[process.env.NODE_ENV || 'developm
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 // 모델 import
 const user = require('./models/user');
+const item = require('./models/item');
 // 세션 설정
 const session = require('express-session');
 app.use(session({
@@ -33,6 +34,7 @@ sequelize.sync({ force: false })
 //인덱스 페이지 설정
 app.get('/', (req, res) => {
     res.render('index', { name: req.session.username });
+
 });
 
 //회원가입 페이지 설정
@@ -88,7 +90,22 @@ app.post('/login', (req, res) => {
         })
 });
 
-//
+//로그아웃 설정
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            res.send('err');
+        }
+        else {
+            res.redirect('/');
+        }
+    })
+})
+
+//상품 등록
+app.get('/admin', (req, res) => {
+    res.render(__dirname + '/views/admin.ejs')
+})
 
 // 프로그램 동작 설정
 const PORT = process.env.PORT || 3000;
