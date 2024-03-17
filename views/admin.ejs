@@ -6,8 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <div action="/admin" method="post">
-    <form>
+    <div>
+    <form action="/upload" method="post" enctype="multipart/form-data">
         <table>
             <tr><td>상품명</td><td><input type="text" name="name"></td></tr>
             <tr><td>카테고리</td><td><select name="category">
@@ -16,6 +16,7 @@
                 <option value="tool">도구</option>
             </select></td></tr>
             <tr><td>이미지</td><td><input type="file" name="imgPath"></td></tr>
+            <tr><td><input type="submit"></td></tr>
         </table>
     </form>
 </div>

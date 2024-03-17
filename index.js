@@ -19,6 +19,17 @@ app.use(session({
     saveUnionitialized: true,
     cookie: { secure: false }
 }));
+//업로드 설정
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'img-' + Date.now())
+    }
+});
+const upload = multer({ storage: storage });
 //뷰 엔진 설정
 app.set('view engine', 'ejs');
 
@@ -50,7 +61,7 @@ app.post('/signup', (req, res) => {
     })
         .then(alreadyAccount => {
             if (alreadyAccount) {
-                res.send('이미 계정이 있습니다');
+                res.send("<script>alert('이미 계정이 있습니다'); location.href='/'</script>");
             }
             else {
                 user.create({
@@ -87,6 +98,9 @@ app.post('/login', (req, res) => {
                 req.session.username = req.body.username;
                 res.redirect('/');
             }
+            else {
+                res.send("<script>alert('로그인에 실패했습니다!'); location.href='/'</script>")
+            }
         })
 });
 
@@ -106,6 +120,20 @@ app.get('/logout', (req, res) => {
 app.get('/admin', (req, res) => {
     res.render(__dirname + '/views/admin.ejs')
 })
+
+app.post('/upload', upload.single('imgPath'), function (req, res) {
+    item.create({
+        name: req.body.name,
+        category: req.body.category,
+        imgPath: req.file.path
+    })
+        .then(success => {
+            res.send("<script>alert('등록했습니다'); location.href='/admin';</script>")
+        })
+        .catch(error => {
+            res.send("<script>alert('error'); location.href='/admin'</script>")
+        })
+});
 
 // 프로그램 동작 설정
 const PORT = process.env.PORT || 3000;
