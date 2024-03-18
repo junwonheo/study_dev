@@ -1,0 +1,13 @@
+<div>
+    <ul>
+        <% items.forEach( item =>{ %>
+            <a href="/cart?item=<%= item.id %>">
+            <ul>
+            <li><img src="<%= item.imgPath %>"></li>
+            <li><%= item.name %></li>
+            <li><%= item.category %></li>
+            </ul>
+            </a>
+        <% }); %>
+    </ul>
+</div>

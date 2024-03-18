@@ -1,16 +1,26 @@
 // express 설정
 const express = require('express');
 const app = express();
+
 //미들웨어 설정
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/uploads', express.static('uploads'));
+
 //시퀄라이즈 설정
 const Sequelize = require('sequelize');
 const config = require('./config/config.json')[process.env.NODE_ENV || 'development'];
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
-// 모델 import
+
+// 모델 import 및 관계 설정
 const user = require('./models/user');
 const item = require('./models/item');
+const cart = require('./models/cart.js');
+user.hasMany(cart, { foreignKey: 'userId' });
+cart.belongsTo(user, { foreignKey: 'userId' });
+item.hasMany(cart, { foreignKey: 'itemId' });
+cart.belongsTo(item, { foreignKey: 'itemId' });
+
 // 세션 설정
 const session = require('express-session');
 app.use(session({
@@ -19,6 +29,7 @@ app.use(session({
     saveUnionitialized: true,
     cookie: { secure: false }
 }));
+
 //업로드 설정
 const multer = require('multer');
 const storage = multer.diskStorage({
@@ -30,6 +41,7 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
+
 //뷰 엔진 설정
 app.set('view engine', 'ejs');
 
@@ -44,8 +56,22 @@ sequelize.sync({ force: false })
 
 //인덱스 페이지 설정
 app.get('/', (req, res) => {
-    res.render('index', { name: req.session.username });
+    item.findAll({})
+        .then(items => {
+            res.render('index', { name: req.session.username, items: items });
+        })
+        .catch(error => {
+            res.send('error');
+        })
+});
 
+//장바구니 추가 설정
+app.get('/cart', (req, res) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+    req.session.cart.push({ itemId: req.query.item });
+    res.send(req.session.cart);
 });
 
 //회원가입 페이지 설정
@@ -118,7 +144,12 @@ app.get('/logout', (req, res) => {
 
 //상품 등록
 app.get('/admin', (req, res) => {
-    res.render(__dirname + '/views/admin.ejs')
+    if (req.session.username === 'admin') {
+        res.render(__dirname + '/views/admin.ejs');
+    }
+    else {
+        res.send("<script>location.href='/'</script>");
+    }
 })
 
 app.post('/upload', upload.single('imgPath'), function (req, res) {
