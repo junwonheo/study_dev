@@ -70,8 +70,22 @@ app.get('/cart', (req, res) => {
     if (!req.session.cart) {
         req.session.cart = [];
     }
-    req.session.cart.push({ itemId: req.query.item });
-    res.send(req.session.cart);
+    if (!req.query.item) {
+
+        res.render('cart', { cartItem: req.session.cart });
+        return;
+    }
+    const cartItem = req.session.cart.find(obj => obj[req.query.item] !== undefined);
+    if (cartItem) {
+        cartItem[req.query.item] += +1;
+    }
+    else {
+        const newItem = {};
+        newItem[req.query.item] = 1;
+        req.session.cart.push(newItem);
+    }
+    res.render('cart', { cartItem: req.session.cart });
+    return;
 });
 
 //회원가입 페이지 설정
@@ -150,7 +164,7 @@ app.get('/admin', (req, res) => {
     else {
         res.send("<script>location.href='/'</script>");
     }
-})
+});
 
 app.post('/upload', upload.single('imgPath'), function (req, res) {
     item.create({

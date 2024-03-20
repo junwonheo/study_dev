@@ -7,6 +7,10 @@
 </head>
 <body>
     <%- include('partials/header') %>
-    
+    <table>
+    <% cartItem.forEach( item => { %>
+        <li><%= JSON.stringify(item) %></li>
+    <% }); %>
+    </table>
 </body>
 </html>
