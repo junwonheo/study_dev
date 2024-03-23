@@ -8,8 +8,8 @@
 <body>
     <%- include('partials/header') %>
     <table>
-    <% cartItem.forEach( item => { %>
-        <li><%= JSON.stringify(item) %></li>
+    <% cartItems.forEach( item => { %>
+        <li>상품명: <%= item.name %> 수량:<%= item.dataValues.quantity %><br><img src="<%= item.imgPath %>"></li>
     <% }); %>
     </table>
 </body>

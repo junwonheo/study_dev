@@ -14,12 +14,12 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 
 // 모델 import 및 관계 설정
 const user = require('./models/user');
-const item = require('./models/item');
+const Item = require('./models/item');
 const cart = require('./models/cart.js');
 user.hasMany(cart, { foreignKey: 'userId' });
 cart.belongsTo(user, { foreignKey: 'userId' });
-item.hasMany(cart, { foreignKey: 'itemId' });
-cart.belongsTo(item, { foreignKey: 'itemId' });
+Item.hasMany(cart, { foreignKey: 'itemId' });
+cart.belongsTo(Item, { foreignKey: 'itemId' });
 
 // 세션 설정
 const session = require('express-session');
@@ -56,7 +56,7 @@ sequelize.sync({ force: false })
 
 //인덱스 페이지 설정
 app.get('/', (req, res) => {
-    item.findAll({})
+    Item.findAll({})
         .then(items => {
             res.render('index', { name: req.session.username, items: items });
         })
@@ -66,27 +66,41 @@ app.get('/', (req, res) => {
 });
 
 //장바구니 추가 설정
-app.get('/cart', (req, res) => {
+app.get('/cart', async (req, res) => {
     if (!req.session.cart) {
-        req.session.cart = [];
+        req.session.cart = {};
+        req.session.cartKeys = [];
     }
+    const cartKeys = await selectItem(req.session.cartKeys, req.session.cart)
     if (!req.query.item) {
 
-        res.render('cart', { cartItem: req.session.cart });
+        res.render('cart', { cartItems: cartKeys });
         return;
     }
-    const cartItem = req.session.cart.find(obj => obj[req.query.item] !== undefined);
-    if (cartItem) {
-        cartItem[req.query.item] += +1;
+    if (req.session.cart[req.query.item]) {
+        req.session.cart[req.query.item] += +1;
     }
     else {
-        const newItem = {};
-        newItem[req.query.item] = 1;
-        req.session.cart.push(newItem);
+        req.session.cart[req.query.item] = 1;
+        req.session.cartKeys.push(req.query.item);
     }
-    res.render('cart', { cartItem: req.session.cart });
+    res.render('cart', { cartItems: cartKeys });
     return;
 });
+
+async function selectItem(cartKeys, quantity) {
+    const items = [];
+    for (const cartKey of cartKeys) {
+        const item = await Item.findOne({
+            where: {
+                id: cartKey
+            }
+        });
+        item.dataValues.quantity = quantity[cartKey];
+        items.push(item);
+    }
+    return items;
+}
 
 //회원가입 페이지 설정
 app.get('/signup', (req, res) => {
