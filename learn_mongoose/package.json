@@ -1,0 +1,21 @@
+{
+  "name": "learn_mongoose",
+  "version": "1.0.0",
+  "description": "몽구스를 배우자",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.2.3",
+    "morgan": "^1.10.0",
+    "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
